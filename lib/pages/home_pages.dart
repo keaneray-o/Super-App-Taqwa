@@ -19,7 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final CarouselController _controller = CarouselController();
-  int _curentIndex = 0;
+  int _currentIndex = 0;
   final posterLIst = const <String>[
     'assets/images/ramadhan-kareem.png',
     'assets/images/idl-fitr.png',
@@ -152,21 +152,65 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  //=================
+  //CAROUSEL CARD
+  //=================
   Widget _buildCarouselSection() {
     return Column(
       children: [
         const SizedBox(height: 20),
         CarouselSlider.builder(
-          itemCount: posterLIst.length, 
+          itemCount: posterLIst.length,
           itemBuilder: (context, index, realIndex) {
             final poster = posterLIst[index];
             return Container(
-              child: Image.asset(poster),
+              margin: EdgeInsets.all(15),
+              child: ClipRRect(
+                borderRadius: BorderRadiusGeometry.circular(20),
+                child: Image.asset(
+                  poster,
+                  width: double.infinity,
+                  fit: BoxFit.fitWidth,
+                ),
+              ),
             );
           },
-          options: CarouselOptions(),
+          options: CarouselOptions(
+            autoPlay: true,
+            height: 300,
+            enlargeCenterPage: true,
+            viewportFraction: 0.7,
+            onPageChanged: (index, reason) {
+              setState(() => _currentIndex = index);
+            },
           ),
+        ),
+
+        //DOT INDIKATOR
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: posterLIst.asMap().entries.map((entry) {
+            return GestureDetector(
+              onTap: () => _currentIndex.animateToPage(entry.key),
+              child: Container(
+                width: 10,
+                height: 10,
+                margin: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _currentIndex == entry.key 
+                  ? Colors.amber 
+                  : Colors.grey[400],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
       ],
     );
   }
+}
+
+extension on int {
+  void animateToPage(int key) {}
 }
