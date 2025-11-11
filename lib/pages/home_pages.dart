@@ -20,12 +20,42 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final CarouselController _controller = CarouselController();
   int _currentIndex = 0;
+  bool _isLoading = true;
+  Duration? _timeRemaining;
+  Timer? _countdownTimer;
+  String _location = 'Mengambil Lokasi......';
+  String _prayTime = 'Loading.......';
+  String _backgroundImage = 'assets/images/bg_morning.png';
+  List<dynamic>? _jadwalSholat;
 
   final posterLIst = const <String>[
     'assets/images/ramadhan-kareem.png',
     'assets/images/idl-fitr.png',
     'assets/images/idl-adh.png',
   ];
+
+   //fungsi teks remaining waktu sholat
+  String _formatDuration(Duration d) {
+    final hours = d.inHours;
+    final minutes = d.inMinutes.remainder(60);
+    return '$hours jam $minutes menit lagi';
+  }
+
+  //state untuk dijalankan diawal
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future _getBackgroundImage(DateTime now) async {
+    if (now.hour < 12) {
+      return 'assets/images/bg_morning.png';
+    } else if (now.hour < 18) {
+      return 'assets/images/bg_afternoon.png';
+    }
+      return 'assets/images/bg_';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +68,7 @@ class _HomePageState extends State<HomePage> {
               // MENU WAKTU SHOLAT BY LOKASI
               //==============================
               _buildHeroSection(),
+              const SizedBox(height: 65),
               //======================
               //MENU SECTION
               //======================
@@ -64,21 +95,17 @@ class _HomePageState extends State<HomePage> {
           width: double.infinity,
           decoration: BoxDecoration(
             color: Color(0xFFB3E5FC),
-            borderRadius:
-            BorderRadius.only(
+            borderRadius: BorderRadius.only(
               bottomRight: Radius.circular(30),
               bottomLeft: Radius.circular(30),
             ),
-          image: DecorationImage(
-            image: AssetImage('asset/images/bg-afternoon.png',), 
-            fit: BoxFit.cover.
+            image: DecorationImage(
+              image: AssetImage('assets/images/bg_afternoon.png'),
+              fit: BoxFit.cover,
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 20,
-              ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -89,23 +116,82 @@ class _HomePageState extends State<HomePage> {
                     fontFamily: 'PoppinsRegular',
                     color: Colors.black,
                     fontSize: 16,
-                    ),
-                ),
-                Text('Ngargoyoso', style: TextStyle( 
-                  fontFamily: 'PoppinsSemiBold',
-                  fontSize: 22,
-                  color: Colors.white
-                ),
+                  ),
                 ),
                 Text(
-                  DateFormat('HH:mm').
-                  format(DateTime.now()), 
+                  'Ngargoyoso',
+                  style: TextStyle(
+                    fontFamily: 'PoppinsSemiBold',
+                    fontSize: 22,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  DateFormat('HH:mm').format(DateTime.now()),
                   style: TextStyle(
                     fontFamily: 'PoppinsBold',
                     fontSize: 50,
-                    height: 1.2
-                    color: Colors.white
-                  ),),
+                    height: 1.2,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        //==========Waktu sholat berikutnya============
+        Positioned(
+          bottom: -55,
+          left: 20,
+          right: 20,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 2,
+                  offset: Offset(0, 4),
+                  color: Colors.amber.withOpacity(0.4),
+                ),
+              ],
+            ),
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+            child: Column(
+              children: [
+                Text(
+                  'waktu sholat selanjutnya',
+                  style: TextStyle(
+                    fontFamily: 'PoppinsRegular',
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  'ASHAR',
+                  style: TextStyle(
+                    fontFamily: 'PoppinsBold',
+                    fontSize: 20,
+                    color: Colors.amber,
+                  ),
+                ),
+                Text(
+                  '14:22',
+                  style: TextStyle(
+                    fontFamily: 'PoppinsBold',
+                    fontSize: 28,
+                    color: Colors.black26,
+                  ),
+                ),
+                Text(
+                  '5 Jam 10 Menit',
+                  style: TextStyle(
+                    fontFamily: 'PoppinsRegular',
+                    fontSize: 13,
+                    color: Colors.grey,
+                  ),
+                ),
               ],
             ),
           ),
@@ -196,7 +282,6 @@ class _HomePageState extends State<HomePage> {
             'assets/images/ic_menu_zakat.png',
             'Khutbah',
             '/zakat',
-            
           ),
         ],
       ),
